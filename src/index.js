@@ -1,10 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import { postgresModule } from "./databases/postgresql.js";
+import { setupCLI } from "./cli/index.js";
 
-console.log("Database Backup Utility Started");
+// Mocking module execution if needed before DB adapters are fully ready.
+// import { postgresModule } from "./databases/postgresql.js";
+// postgresModule();
 
-console.log("Database Host:", process.env.DB_HOST);
-
-postgresModule();
+setupCLI();
