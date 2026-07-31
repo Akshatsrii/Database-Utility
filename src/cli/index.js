@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { listBackups } from '../storage/local.js';
+import { startScheduler } from '../scheduler/index.js';
 
 export function setupCLI() {
   const program = new Command();
@@ -55,6 +56,22 @@ export function setupCLI() {
         );
       } catch (error) {
         console.error('Error listing backups:', error.message);
+      }
+    });
+
+  program.command('schedule')
+    .description('Schedule periodic backups')
+    .requiredOption('--db <type>', 'Database type (e.g., postgres, mysql, mongodb, sqlite)')
+    .requiredOption('--cron <expression>', 'Cron expression for schedule (e.g., "0 0 * * *")')
+    .action((options) => {
+      try {
+        const dummyBackupFunction = (dbType) => {
+          console.log(`Mock: Executing backup for ${dbType}...`);
+        };
+        startScheduler(options.db, options.cron, dummyBackupFunction);
+        console.log(`Scheduler is now running. Press Ctrl+C to stop.`);
+      } catch (error) {
+        console.error('Failed to start scheduler:', error.message);
       }
     });
 
