@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { listBackups } from '../storage/local.js';
 import { startScheduler } from '../scheduler/index.js';
 import { uploadToDrive } from '../storage/gdrive.js';
+import { sendSlackNotification } from '../notifications/slack.js';
 import path from 'path';
 
 export function setupCLI() {
@@ -23,12 +24,32 @@ export function setupCLI() {
     .description('Backup database')
     .requiredOption('--db <type>', 'Database type (e.g., postgres, mysql, mongodb, sqlite)')
     .option('--upload-drive', 'Upload the backup to Google Drive after creation')
+    .option('--notify-slack', 'Send a Slack notification upon completion or failure')
     .action(async (options) => {
       console.log(`Mock: Backing up ${options.db} database...`);
       const dummyFilePath = path.resolve(process.cwd(), 'backups', options.db, 'dummy.sql');
+      const dummyFileName = `dummy-${Date.now()}.sql`;
       
-      if (options.uploadDrive) {
-        await uploadToDrive(dummyFilePath, `dummy-${Date.now()}.sql`);
+      try {
+        if (options.uploadDrive) {
+          await uploadToDrive(dummyFilePath, dummyFileName);
+        }
+        
+        if (options.notifySlack) {
+          await sendSlackNotification({
+            dbType: options.db,
+            status: 'success',
+            fileName: dummyFileName
+          });
+        }
+      } catch (error) {
+        if (options.notifySlack) {
+          await sendSlackNotification({
+            dbType: options.db,
+            status: 'failure',
+            errorDetails: error.message
+          });
+        }
       }
     });
 
@@ -72,13 +93,33 @@ export function setupCLI() {
     .requiredOption('--db <type>', 'Database type (e.g., postgres, mysql, mongodb, sqlite)')
     .requiredOption('--cron <expression>', 'Cron expression for schedule (e.g., "0 0 * * *")')
     .option('--upload-drive', 'Upload scheduled backups to Google Drive')
+    .option('--notify-slack', 'Send Slack notifications for scheduled backups')
     .action((options) => {
       try {
         const dummyBackupFunction = async (dbType) => {
           console.log(`Mock: Executing backup for ${dbType}...`);
           const dummyFilePath = path.resolve(process.cwd(), 'backups', dbType, 'dummy.sql');
-          if (options.uploadDrive) {
-            await uploadToDrive(dummyFilePath, `scheduled-dummy-${Date.now()}.sql`);
+          const dummyFileName = `scheduled-dummy-${Date.now()}.sql`;
+          
+          try {
+            if (options.uploadDrive) {
+              await uploadToDrive(dummyFilePath, dummyFileName);
+            }
+            if (options.notifySlack) {
+              await sendSlackNotification({
+                dbType,
+                status: 'success',
+                fileName: dummyFileName
+              });
+            }
+          } catch (error) {
+            if (options.notifySlack) {
+              await sendSlackNotification({
+                dbType,
+                status: 'failure',
+                errorDetails: error.message
+              });
+            }
           }
         };
         startScheduler(options.db, options.cron, dummyBackupFunction);
