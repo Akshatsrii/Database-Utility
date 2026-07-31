@@ -72,9 +72,9 @@ This project is built by a 3-member team over 14 days (2–3 hrs/day) using para
 
 | Member | Responsibility | Branch |
 |---|---|---|
-| **Akshat Srivastava** | Database Connectivity + Backup Engine — PostgreSQL, MySQL, MongoDB, SQLite adapters, connection testing, native backup commands, Backup Manager | `feature/database-backup` |
-| **Riya Bansal** | Restore + Compression + Logging — compression/decompression, restore flows, selective restore, activity logging | `feature/restore-compression` |
-| **Shahnaaj Khan** | CLI + Storage + Automation — CLI commands, local storage, scheduler, Google Drive, Slack notifications | `feature/cli-automation` |
+| **Riya Bansal** | Database Connectivity + Backup Engine — PostgreSQL, MySQL, MongoDB, SQLite adapters, connection testing, native backup commands, Backup Manager | `feature/database-backup` |
+| **Shahnaaj Khan** | Restore + Compression + Logging — compression/decompression, restore flows, selective restore, activity logging | `feature/restore-compression` |
+| **Akshat Srivastava** | CLI + Storage + Automation — CLI commands, local storage, scheduler, Google Drive, Slack notifications | `feature/cli-automation` |
 
 ---
 
