@@ -9,3 +9,6 @@ node_modules/
 
 # Backups
 backups/
+
+# Google Cloud credentials
+google-service-account.json

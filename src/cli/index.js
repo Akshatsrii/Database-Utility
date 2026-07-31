@@ -1,6 +1,8 @@
 import { Command } from 'commander';
 import { listBackups } from '../storage/local.js';
 import { startScheduler } from '../scheduler/index.js';
+import { uploadToDrive } from '../storage/gdrive.js';
+import path from 'path';
 
 export function setupCLI() {
   const program = new Command();
@@ -20,8 +22,14 @@ export function setupCLI() {
   program.command('backup')
     .description('Backup database')
     .requiredOption('--db <type>', 'Database type (e.g., postgres, mysql, mongodb, sqlite)')
-    .action((options) => {
+    .option('--upload-drive', 'Upload the backup to Google Drive after creation')
+    .action(async (options) => {
       console.log(`Mock: Backing up ${options.db} database...`);
+      const dummyFilePath = path.resolve(process.cwd(), 'backups', options.db, 'dummy.sql');
+      
+      if (options.uploadDrive) {
+        await uploadToDrive(dummyFilePath, `dummy-${Date.now()}.sql`);
+      }
     });
 
   program.command('restore')
@@ -63,10 +71,15 @@ export function setupCLI() {
     .description('Schedule periodic backups')
     .requiredOption('--db <type>', 'Database type (e.g., postgres, mysql, mongodb, sqlite)')
     .requiredOption('--cron <expression>', 'Cron expression for schedule (e.g., "0 0 * * *")')
+    .option('--upload-drive', 'Upload scheduled backups to Google Drive')
     .action((options) => {
       try {
-        const dummyBackupFunction = (dbType) => {
+        const dummyBackupFunction = async (dbType) => {
           console.log(`Mock: Executing backup for ${dbType}...`);
+          const dummyFilePath = path.resolve(process.cwd(), 'backups', dbType, 'dummy.sql');
+          if (options.uploadDrive) {
+            await uploadToDrive(dummyFilePath, `scheduled-dummy-${Date.now()}.sql`);
+          }
         };
         startScheduler(options.db, options.cron, dummyBackupFunction);
         console.log(`Scheduler is now running. Press Ctrl+C to stop.`);
