@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { listBackups } from '../storage/local.js';
 
 export function setupCLI() {
   const program = new Command();
@@ -34,8 +35,27 @@ export function setupCLI() {
     .description('List backups')
     .option('--db <type>', 'Optional: Filter backups by database type')
     .action((options) => {
-      const filterText = options.db ? ` for ${options.db}` : '';
-      console.log(`Mock: Listing available backups${filterText}...`);
+      console.log(`Listing available backups${options.db ? ` for ${options.db}` : ''}...\n`);
+      
+      try {
+        const backups = listBackups(options.db);
+        
+        if (backups.length === 0) {
+          console.log('No backups found.');
+          return;
+        }
+
+        console.table(
+          backups.map(b => ({
+            Database: b.dbType,
+            File: b.file,
+            'Size (MB)': (b.size / (1024 * 1024)).toFixed(2),
+            Date: b.createdAt.toLocaleString()
+          }))
+        );
+      } catch (error) {
+        console.error('Error listing backups:', error.message);
+      }
     });
 
   program.parse(process.argv);
