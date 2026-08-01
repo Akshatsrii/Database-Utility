@@ -35,16 +35,16 @@ const backupFilePath = path.join(
 console.log("Backup File Path:");
 console.log(backupFilePath);
 
-export function createPostgresBackup() {
+function createPostgresBackup() {
 
     const command =
-    `"C:\\Program Files\\PostgreSQL\\17\\bin\\pg_dump.exe"` +
-    ` -h ${process.env.DB_HOST}` +
-    ` -p ${process.env.DB_PORT}` +
-    ` -U ${process.env.DB_USER}` +
-    ` -d ${process.env.DB_NAME}` +
-    ` -F p` +
-    ` -f "${backupFilePath}"`;
+        `"C:\\Program Files\\PostgreSQL\\17\\bin\\pg_dump.exe"` +
+        ` -h ${process.env.DB_HOST}` +
+        ` -p ${process.env.DB_PORT}` +
+        ` -U ${process.env.DB_USER}` +
+        ` -d ${process.env.DB_NAME}` +
+        ` -F p` +
+        ` -f "${backupFilePath}"`;
 
     console.log(command);
 
@@ -70,5 +70,36 @@ export function createPostgresBackup() {
         console.log(backupFilePath);
 
     });
+
+}
+
+export async function backupManager(databaseType) {
+
+    console.log(`Starting ${databaseType} Backup...`);
+
+   switch (databaseType) {
+
+   case "PostgreSQL":
+    createPostgresBackup();
+    break;
+    
+    case "MySQL":
+        console.log("MySQL Backup is not implemented yet.");
+        return;
+
+    case "MongoDB":
+        console.log("MongoDB Backup is not implemented yet.");
+        return;
+
+    case "SQLite":
+        console.log("SQLite Backup is not implemented yet.");
+        return;
+
+    default:
+        console.log("Unsupported Database Type!");
+        return;
+
+}
+
 
 }
