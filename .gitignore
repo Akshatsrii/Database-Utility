@@ -7,3 +7,8 @@ node_modules/
 # Logs
 *.log
 
+# Backups
+backups/
+
+# Google Cloud credentials
+google-service-account.json
