@@ -35,14 +35,18 @@ const backupFilePath = path.join(
 console.log("Backup File Path:");
 console.log(backupFilePath);
 
-function createPostgresBackup() {
+export function createPostgresBackup() {
 
     const command =
-        `"C:\\Program Files\\PostgreSQL\\17\\bin\\pg_dump.exe"` +
-        ` -U postgres` +
-        ` -d database_utility` +
-        ` -F p` +
-        ` -f "${backupFilePath}"`;
+    `"C:\\Program Files\\PostgreSQL\\17\\bin\\pg_dump.exe"` +
+    ` -h ${process.env.DB_HOST}` +
+    ` -p ${process.env.DB_PORT}` +
+    ` -U ${process.env.DB_USER}` +
+    ` -d ${process.env.DB_NAME}` +
+    ` -F p` +
+    ` -f "${backupFilePath}"`;
+
+    console.log(command);
 
     exec(command, {
         env: {
