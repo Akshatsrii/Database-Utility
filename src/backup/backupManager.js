@@ -73,6 +73,43 @@ function createPostgresBackup() {
 
 }
 
+function createMySQLBackup() {
+
+    const command =
+    `"C:\\Program Files\\MySQL\\MySQL Server 8.0\\bin\\mysqldump.exe"` +
+    ` -h ${process.env.MYSQL_HOST}` +
+    ` -P ${process.env.MYSQL_PORT}` +
+    ` -u ${process.env.MYSQL_USER}` +
+    ` ${process.env.MYSQL_DATABASE}` +
+    ` --result-file="${backupFilePath}"`;
+
+    console.log(command);
+
+    exec(command, {
+    env: {
+        ...process.env,
+        MYSQL_PWD: process.env.MYSQL_PASSWORD
+    }
+}, (error, stdout, stderr) => {
+
+    if (error) {
+        console.log("MySQL Backup Failed!");
+        console.log(error.message);
+        return;
+    }
+
+    if (stderr) {
+        console.log(stderr);
+    }
+
+    console.log("MySQL Backup Created Successfully!");
+    console.log("Backup saved at:");
+    console.log(backupFilePath);
+
+});
+
+}
+
 export async function backupManager(databaseType) {
 
     console.log(`Starting ${databaseType} Backup...`);
@@ -83,9 +120,9 @@ export async function backupManager(databaseType) {
     createPostgresBackup();
     break;
     
-    case "MySQL":
-        console.log("MySQL Backup is not implemented yet.");
-        return;
+   case "MySQL":
+    createMySQLBackup();
+    break;
 
     case "MongoDB":
         console.log("MongoDB Backup is not implemented yet.");
