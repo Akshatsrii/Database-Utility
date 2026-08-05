@@ -110,6 +110,40 @@ function createMySQLBackup() {
 
 }
 
+function createMongoBackup() {
+
+    const backupDirectory = path.join(
+        backupFolder,
+        `mongodb_backup_${timestamp}`
+    );
+
+    const command =
+        `"${process.env.MONGODB_BACKUP_PATH}"` +
+        ` --uri="${process.env.MONGODB_URI}"` +
+        ` --db="${process.env.MONGODB_DATABASE}"` +
+        ` --out="${backupDirectory}"`;
+
+    console.log(command);
+    exec(command, (error, stdout, stderr) => {
+
+    if (error) {
+        console.log("MongoDB Backup Failed!");
+        console.log(error.message);
+        return;
+    }
+
+   if (stdout) {
+    console.log(stdout);
+}
+
+    console.log("MongoDB Backup Created Successfully!");
+    console.log("Backup saved at:");
+    console.log(backupDirectory);
+
+});
+
+}
+
 export async function backupManager(databaseType) {
 
     console.log(`Starting ${databaseType} Backup...`);
@@ -124,9 +158,9 @@ export async function backupManager(databaseType) {
     createMySQLBackup();
     break;
 
-    case "MongoDB":
-        console.log("MongoDB Backup is not implemented yet.");
-        return;
+  case "MongoDB":
+    createMongoBackup();
+    break;
 
     case "SQLite":
         console.log("SQLite Backup is not implemented yet.");
