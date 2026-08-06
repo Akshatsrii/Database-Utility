@@ -144,6 +144,29 @@ function createMongoBackup() {
 
 }
 
+function createSQLiteBackup() {
+
+    const sqliteDatabasePath = path.join(
+        process.cwd(),
+        "database.sqlite"
+    );
+
+    const sqliteBackupPath = path.join(
+        backupFolder,
+        `sqlite_backup_${timestamp}.sqlite`
+    );
+
+    fs.copyFileSync(
+        sqliteDatabasePath,
+        sqliteBackupPath
+    );
+
+    console.log("SQLite Backup Created Successfully!");
+    console.log("Backup saved at:");
+    console.log(sqliteBackupPath);
+
+}
+
 export async function backupManager(databaseType) {
 
     console.log(`Starting ${databaseType} Backup...`);
@@ -162,9 +185,9 @@ export async function backupManager(databaseType) {
     createMongoBackup();
     break;
 
-    case "SQLite":
-        console.log("SQLite Backup is not implemented yet.");
-        return;
+   case "SQLite":
+    createSQLiteBackup();
+    break;
 
     default:
         console.log("Unsupported Database Type!");
